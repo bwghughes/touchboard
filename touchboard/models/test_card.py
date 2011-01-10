@@ -10,26 +10,17 @@ import sys
 from nose.tools import *
 from mock import Mock, patch, MagicMock
 
-from card import Card
-
+from models.card import Card, CardEvent
 
 class TestCard(object):
-    def __init__(self, *args, **kwargs):
-        pass
-    
-    def setup(self):
-        self.card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Planned')
 
-    def teardown(self):
-        pass
-    
-    @patch('card.statuses', spec=MagicMock)
-    def test_card_has_all_the_necessaries(self, mock_statuses):    
-        assert self.card.tag
-        assert self.card.story_id
-        assert self.card.points
-        assert self.card.status
-        
+    def test_card_has_all_the_necessaries(self):    
+        card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Planned')
+        assert card.story_id
+        assert card.points
+        assert card.status
+        assert card.card_id
+
     @raises(ValueError) 
     def test_raises_error_if_tag_is_none(self):
         card = Card(tag=None, story_id=Mock(), points=Mock(), status='Planned')
@@ -47,9 +38,54 @@ class TestCard(object):
         card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status=None)
         
     def test_card_id_is_valid(self):
-        assert isinstance(self.card.card_id, str)
-        assert len(self.card.card_id.split(':')) > 0
+        card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Planned')
+        assert isinstance(card.card_id, str)
+        assert len(card.card_id.split(':')) > 0
+
+
+class TestCardEvent(object):
+    """docstring for TestCardEvent"""
+    def setup(self):
+        pass
+                
+    def teardown(self):
+        pass
+    
+    @patch('models.card.Card')
+    @patch('models.card.log')
+    @patch.object(CardEvent, '_register')
+    def test_register_is_processed_when_reg_called(self, mock_card, mock_log, mock_register):
+        ce = CardEvent(mock_card, 'register')
+        ce.process()
+        assert ce._register.called
+        assert mock_card.called
+        assert mock_log.info.called
         
-    @raises(ValueError) 
-    def test_card_is_invalid_with_invalid_status(self):
-        card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Thingummy')
+    @patch('models.card.Card')
+    @patch('models.card.log')
+    @patch.object(CardEvent, '_unregister')
+    def test_unregister_is_processed_when_unreg_called(self, mock_card, mock_log, mock_unregister):
+        ce = CardEvent(mock_card, 'unregister')
+        ce.process()
+        assert ce._unregister.called
+        assert mock_card.called
+        assert mock_log.info.called
+
+    @patch('models.card.Card')
+    @patch('models.card.log')
+    @patch.object(CardEvent, '_state_change')
+    def test_state_change_is_processed_when_state_change_called(self, mock_card, mock_log, mock_unregister):
+        ce = CardEvent(mock_card, 'state_change')
+        ce.process()
+        assert ce._state_change.called
+        assert mock_card.called
+        assert mock_log.info.called
+
+    @raises(AttributeError)
+    @patch('models.card.log')
+    @patch('models.card.Card')
+    def test_process_fails_when_non_existent_event(self, mock_card, mock_log):
+        ce = CardEvent(mock_card, 'non_existent_event_type')
+        ce.process()
+        assert mock_log.error.called
+        

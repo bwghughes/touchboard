@@ -6,3 +6,5 @@ lib
 man
 share
 .Python
+*.swp
+.coverage

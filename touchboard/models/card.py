@@ -4,17 +4,15 @@
 # Created: January 7, 2011
 # Version: 0.0.1
 # By: Ben Hughes (bwghughes@gmail.com)
-
-
-
-
+from logbook import Logger
+log = Logger('card')
 ######################################################
 #
 # Card 
 #
 ######################################################
 """
-    The job of this class is to process Card stuff
+    The job of this class is to act as a Card.
 """
 class Card(object):
     """Represents a card object"""
@@ -22,16 +20,12 @@ class Card(object):
         for k, v in kwargs.iteritems():
             if v is None:
                 raise ValueError('%s cannot have a value of None.' % str(k))
-
-            if str(k) is 'status':
-                if v not in statuses:
-                    raise ValueError('%s is not a valid status' % str(v))
-            
             setattr(self, k, v)
 
     @property
     def card_id(self):
-        return '%s:%s' % (str(self.tag), str(self.story_id))
+        if self.tag and self.story_id:
+            return '%s:%s' % (str(self.tag), str(self.story_id))
 
 ######################################################
 #
@@ -45,23 +39,32 @@ class CardEvent(object):
     """docstring for CardEvent"""
     
     card_states = sorted({0:'Unregistered', 1:'Planned', 2:'In Progress', 3:'In QA', 4:'Done'})
-    event_types = sorted({1:'register', 1:'unregister', 2:'state_change'})
     
     def __init__(self, card, event_type):        
         self.event_type = event_type
         self.card = card
         
     def process(self):
-        self.__call__('_%s' % self.event_type) 
+        log.info('Processing card event for %s' % self.card)
+        try:
+            event = '_%s' % self.event_type
+            getattr(self, event)()
+        except AttributeError:
+            log.error('Cannot find card event method %s' % event)
+            raise
         
-    def _register(self):
+    def _register(self, tag, story_id):
+        log.info('Registering card %s' % self.card)
         pass
-        
+            
     def _unregister(self):
+        log.info('Unegistering card %s' % self.card)
         pass
         
     def _state_change(self):
+        log.info('Changing state for card %s' % self.card)
         pass
+
 ######################################################
 #
 # Card History

@@ -1,10 +1,13 @@
 Flask==0.6.1
 Jinja2==2.5.5
+Logbook==0.3
 PyYAML==3.09
 Pygments==1.4
 Werkzeug==0.6.2
 argh==0.14.0
 bpython==0.9.7.1
+coverage==3.4
+jsonpickle==0.3.1
 mock==0.7.0b4
 nose==1.0.0
 paragram==0.1.2
