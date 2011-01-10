@@ -1,0 +1,5 @@
+This an event processor for RFID events using touchatag and tagEventor.
+
+The program is designed to allow old style analogue interactions with a card wall, and update underlying systems with card status and burndowns.
+
+See http://blogs.atlassian.com/news/2010/12/ultimate-wallboard-winner.html 
