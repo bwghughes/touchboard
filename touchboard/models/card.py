@@ -26,6 +26,13 @@ class Card(object):
     def card_id(self):
         if self.tag and self.story_id:
             return '%s:%s' % (str(self.tag), str(self.story_id))
+            
+    @property
+    def is_registered(self):
+        if self.tag and self.story_id:
+            return True
+        else:
+            return False
 
 ######################################################
 #

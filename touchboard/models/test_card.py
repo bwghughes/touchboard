@@ -41,8 +41,16 @@ class TestCard(object):
         card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Planned')
         assert isinstance(card.card_id, str)
         assert len(card.card_id.split(':')) > 0
+        
+    def test_is_registered_is_true_when_associated(self):
+        card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Planned')
+        assert card.is_registered
 
-
+    def test_is_registered_is_false_when_no_story_id(self):
+        card = Card(tag=Mock(), story_id=Mock(), points=Mock(), status='Planned')
+        card.story_id = None
+        assert not card.is_registered
+    
 class TestCardEvent(object):
     """docstring for TestCardEvent"""
     def setup(self):
